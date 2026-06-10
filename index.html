@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily Beauty — A Dashboard for Wonder</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f4ee;
+    --ink: #1f1b16;
+    --ink-soft: #5c5346;
+    --ink-faint: #95897a;
+    --card: #fffdf9;
+    --line: #e4ddd0;
+    --accent: #9a6b2f;
+    --accent-soft: #c9a36a;
+    --shadow: 0 1px 2px rgba(31,27,22,.05), 0 8px 28px rgba(31,27,22,.08);
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Inter', -apple-system, sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    padding-bottom: 80px;
+  }
+  ::selection { background: var(--accent-soft); color: #fff; }
+
+  header {
+    text-align: center;
+    padding: 64px 24px 36px;
+    max-width: 880px;
+    margin: 0 auto;
+  }
+  .eyebrow {
+    font-size: 11px; letter-spacing: .32em; text-transform: uppercase;
+    color: var(--accent); font-weight: 500;
+  }
+  h1 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: clamp(40px, 6vw, 64px);
+    font-weight: 500;
+    margin: 10px 0 6px;
+    letter-spacing: -.01em;
+  }
+  .dateline {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-size: 20px;
+    color: var(--ink-soft);
+  }
+  .prompt {
+    margin: 26px auto 0;
+    max-width: 560px;
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 21px;
+    color: var(--ink-soft);
+    border-top: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    padding: 16px 8px;
+  }
+  .toolbar {
+    display: flex; gap: 12px; justify-content: center; margin-top: 24px; flex-wrap: wrap;
+  }
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; letter-spacing: .14em; text-transform: uppercase; font-weight: 500;
+    background: none; border: 1px solid var(--ink); color: var(--ink);
+    padding: 10px 22px; border-radius: 999px; cursor: pointer;
+    transition: all .25s ease;
+  }
+  .btn:hover { background: var(--ink); color: var(--bg); }
+  .btn.gold { border-color: var(--accent); color: var(--accent); }
+  .btn.gold:hover { background: var(--accent); color: #fff; }
+
+  .grid {
+    max-width: 1180px;
+    margin: 28px auto 0;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+    gap: 26px;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    display: flex; flex-direction: column;
+    transition: transform .3s ease, box-shadow .3s ease;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 2px 4px rgba(31,27,22,.06), 0 18px 44px rgba(31,27,22,.12); }
+  .card.wide { grid-column: span 2; }
+  @media (max-width: 760px) { .card.wide { grid-column: span 1; } }
+
+  .card-img {
+    width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block;
+    background: linear-gradient(135deg, #ece5d8, #ddd2bf);
+  }
+  .card-body { padding: 22px 24px 20px; display: flex; flex-direction: column; flex: 1; }
+  .cat {
+    font-size: 10px; letter-spacing: .28em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 8px;
+    display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .star {
+    cursor: pointer; border: none; background: none; font-size: 16px;
+    color: var(--ink-faint); transition: color .2s, transform .2s; line-height: 1;
+  }
+  .star:hover { transform: scale(1.2); }
+  .star.saved { color: var(--accent); }
+  .card h2 {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 26px; font-weight: 600; line-height: 1.2; margin-bottom: 4px;
+  }
+  .byline {
+    font-family: 'Cormorant Garamond', serif; font-style: italic;
+    font-size: 17px; color: var(--ink-soft); margin-bottom: 12px;
+  }
+  .extract { font-size: 13.5px; color: var(--ink-soft); flex: 1; }
+  .poem-lines {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 18px; line-height: 1.55; white-space: pre-wrap;
+    color: var(--ink); flex: 1;
+  }
+  .links {
+    margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line);
+    display: flex; flex-wrap: wrap; gap: 8px 16px;
+  }
+  .links a {
+    font-size: 11.5px; letter-spacing: .08em; text-transform: uppercase;
+    font-weight: 500; color: var(--accent); text-decoration: none;
+    border-bottom: 1px solid transparent; transition: border-color .2s;
+  }
+  .links a:hover { border-bottom-color: var(--accent); }
+  .skeleton { animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .45; } }
+  .sk-line { height: 12px; background: var(--line); border-radius: 6px; margin-bottom: 10px; }
+  .err { font-size: 13px; color: var(--ink-faint); font-style: italic; }
+
+  /* Learning section */
+  .learn {
+    max-width: 1180px; margin: 64px auto 0; padding: 0 24px;
+  }
+  .learn h3 {
+    font-family: 'Cormorant Garamond', serif; font-size: 34px; font-weight: 500;
+    text-align: center; margin-bottom: 6px;
+  }
+  .learn .sub { text-align: center; color: var(--ink-soft); font-size: 14px; margin-bottom: 30px; }
+  .learn-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 18px;
+  }
+  .learn-col {
+    background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px 20px;
+  }
+  .learn-col h4 {
+    font-size: 11px; letter-spacing: .24em; text-transform: uppercase;
+    color: var(--accent); font-weight: 600; margin-bottom: 10px;
+  }
+  .learn-col a {
+    display: block; font-size: 13px; color: var(--ink); text-decoration: none;
+    padding: 5px 0; border-bottom: 1px dashed transparent;
+  }
+  .learn-col a:hover { color: var(--accent); }
+  .learn-col span { display: block; font-size: 11px; color: var(--ink-faint); }
+
+  /* Collection drawer */
+  #collection {
+    position: fixed; top: 0; right: -420px; width: 400px; max-width: 92vw; height: 100vh;
+    background: var(--card); border-left: 1px solid var(--line);
+    box-shadow: -12px 0 40px rgba(31,27,22,.15);
+    transition: right .35s ease; z-index: 50; padding: 28px; overflow-y: auto;
+  }
+  #collection.open { right: 0; }
+  #collection h3 { font-family: 'Cormorant Garamond', serif; font-size: 28px; margin-bottom: 4px; }
+  #collection .sub { font-size: 12px; color: var(--ink-faint); margin-bottom: 20px; }
+  .coll-item { border-bottom: 1px solid var(--line); padding: 12px 0; }
+  .coll-item .c { font-size: 9px; letter-spacing: .22em; text-transform: uppercase; color: var(--accent); font-weight: 600; }
+  .coll-item a { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--ink); text-decoration: none; }
+  .coll-item a:hover { color: var(--accent); }
+  .coll-item .d { font-size: 11px; color: var(--ink-faint); }
+  .coll-item button { float: right; border: none; background: none; color: var(--ink-faint); cursor: pointer; font-size: 13px; }
+  .close-x { position: absolute; top: 18px; right: 22px; border: none; background: none; font-size: 22px; cursor: pointer; color: var(--ink-soft); }
+
+  footer { text-align: center; margin-top: 70px; color: var(--ink-faint); font-size: 12px; padding: 0 24px; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">A daily gathering of beautiful things</div>
+  <h1>Daily Beauty</h1>
+  <div class="dateline" id="dateline"></div>
+  <div class="prompt" id="prompt"></div>
+  <div class="toolbar">
+    <button class="btn gold" id="surprise">✦ &nbsp;New Inspiration</button>
+    <button class="btn" id="openColl">My Collection</button>
+    <button class="btn" id="shareBtn">Share</button>
+  </div>
+</header>
+
+<main class="grid" id="grid">
+  <article class="card wide" id="card-art"></article>
+  <article class="card" id="card-music"></article>
+  <article class="card" id="card-nature"></article>
+  <article class="card" id="card-photo"></article>
+  <article class="card" id="card-poem"></article>
+  <article class="card" id="card-writing"></article>
+  <article class="card wide" id="card-craft"></article>
+</main>
+
+<section class="learn">
+  <h3>Go Deeper</h3>
+  <div class="sub">Free places to turn today's wonder into real knowledge.</div>
+  <div class="learn-grid">
+    <div class="learn-col"><h4>Art</h4>
+      <a href="https://smarthistory.org" target="_blank">Smarthistory<span>Art history, free &amp; scholarly</span></a>
+      <a href="https://www.khanacademy.org/humanities/art-history" target="_blank">Khan Academy Art History<span>Structured courses</span></a>
+      <a href="https://artsandculture.google.com" target="_blank">Google Arts &amp; Culture<span>Museums in high resolution</span></a>
+      <a href="https://www.metmuseum.org/perspectives" target="_blank">The Met — Perspectives<span>Essays from curators</span></a>
+    </div>
+    <div class="learn-col"><h4>Music</h4>
+      <a href="https://www.youtube.com/@ListeningIn-Music" target="_blank">Listen &amp; analyze on YouTube<span>Search any work below</span></a>
+      <a href="https://oyc.yale.edu/music/musi-112" target="_blank">Open Yale: Listening to Music<span>Full free course</span></a>
+      <a href="https://www.classicfm.com/discover-music/" target="_blank">Classic FM — Discover<span>Approachable deep dives</span></a>
+      <a href="https://musictheory.net" target="_blank">musictheory.net<span>Learn the language itself</span></a>
+    </div>
+    <div class="learn-col"><h4>Nature</h4>
+      <a href="https://apod.nasa.gov/apod/archivepix.html" target="_blank">APOD Archive<span>Decades of the cosmos</span></a>
+      <a href="https://www.allaboutbirds.org" target="_blank">Cornell Lab of Ornithology<span>Birds &amp; bird song</span></a>
+      <a href="https://www.inaturalist.org" target="_blank">iNaturalist<span>Identify what you see outside</span></a>
+      <a href="https://earthobservatory.nasa.gov" target="_blank">NASA Earth Observatory<span>The planet from above</span></a>
+    </div>
+    <div class="learn-col"><h4>Writing</h4>
+      <a href="https://www.poetryfoundation.org/learn" target="_blank">Poetry Foundation — Learn<span>Guides to reading poems</span></a>
+      <a href="https://www.gutenberg.org" target="_blank">Project Gutenberg<span>70,000 free classics</span></a>
+      <a href="https://www.themarginalian.org" target="_blank">The Marginalian<span>Essays on beauty &amp; meaning</span></a>
+      <a href="https://standardebooks.org" target="_blank">Standard Ebooks<span>Beautifully typeset classics</span></a>
+    </div>
+    <div class="learn-col"><h4>Craft</h4>
+      <a href="https://www.craftsmanship.net" target="_blank">Craftsmanship Quarterly<span>Stories of mastery</span></a>
+      <a href="https://www.youtube.com/results?search_query=process+documentary+craft" target="_blank">Process documentaries<span>Watch hands at work</span></a>
+      <a href="https://folklife.si.edu" target="_blank">Smithsonian Folklife<span>Living traditions</span></a>
+      <a href="https://www.instructables.com" target="_blank">Instructables<span>Try a craft yourself</span></a>
+    </div>
+  </div>
+</section>
+
+<aside id="collection">
+  <button class="close-x" id="closeColl">×</button>
+  <h3>My Collection</h3>
+  <div class="sub">Things you starred, kept for further study.</div>
+  <div id="collList"></div>
+</aside>
+
+<footer>
+  Sources: Art Institute of Chicago · The Met · NASA APOD · Wikimedia · Wikipedia · PoetryDB — all free &amp; open.<br>
+  Open this page each morning; it finds new beauty for every date.
+</footer>
+
+<script>
+/* ---------- seeded daily randomness ---------- */
+function xmur3(str){let h=1779033703^str.length;for(let i=0;i<str.length;i++){h=Math.imul(h^str.charCodeAt(i),3432918353);h=(h<<13)|(h>>>19);}return()=>{h=Math.imul(h^(h>>>16),2246822507);h=Math.imul(h^(h>>>13),3266489909);return(h^=h>>>16)>>>0;};}
+function mulberry32(a){return()=>{a|=0;a=(a+0x6D2B79F5)|0;let t=Math.imul(a^(a>>>15),1|a);t=(t+Math.imul(t^(t>>>7),61|t))^t;return((t^(t>>>14))>>>0)/4294967296;};}
+const today=new Date();
+const ymd=today.toISOString().slice(0,10);
+let seedStr=ymd;
+let rng=mulberry32(xmur3(seedStr)());
+const pick=(arr)=>arr[Math.floor(rng()*arr.length)];
+const yt=(q)=>'https://www.youtube.com/results?search_query='+encodeURIComponent(q);
+const wiki=(t)=>'https://en.wikipedia.org/wiki/'+encodeURIComponent(t.replace(/ /g,'_'));
+const gsearch=(q)=>'https://www.google.com/search?q='+encodeURIComponent(q);
+
+document.getElementById('dateline').textContent=today.toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+/* ---------- daily learning prompt ---------- */
+const PROMPTS=[
+ "Today, pick one item below and spend fifteen unhurried minutes with it before reading anything about it.",
+ "Notice one detail today that took its maker years to learn. Ask: how would I begin?",
+ "Read about the life of today's artist or composer. Beauty has a biography.",
+ "Listen to today's music twice — once doing nothing else, once reading about its structure.",
+ "Write three sentences about why today's artwork moves you (or doesn't). Precision is a form of attention.",
+ "Find the technique behind one item below and watch someone perform it.",
+ "Memorize four lines of today's poem. Carry them through the day.",
+ "Compare today's artwork with yesterday's memory of one. What changed in you?",
+ "Today's question: what constraint made this beautiful thing possible?",
+ "Learn one term of art today — a glaze, a cadence, a meter — and use it correctly once.",
+ "Trace today's craft to its country of origin. What did the land contribute?",
+ "Beauty rewards repetition: revisit whatever struck you most this week."
+];
+document.getElementById('prompt').textContent='“'+pick(PROMPTS)+'”';
+
+/* ---------- curated daily rotations ---------- */
+const MUSIC=[
+ {t:"Spiegel im Spiegel",by:"Arvo Pärt",y:"1978",n:"Tintinnabuli style — two voices, infinite calm.",w:"Spiegel im Spiegel"},
+ {t:"The Lark Ascending",by:"Ralph Vaughan Williams",y:"1914",n:"A violin imitating birdsong over an English meadow.",w:"The Lark Ascending"},
+ {t:"Clair de Lune",by:"Claude Debussy",y:"1905",n:"Impressionism in sound; moonlight as harmony.",w:"Suite bergamasque"},
+ {t:"Goldberg Variations",by:"J.S. Bach",y:"1741",n:"One aria, thirty transformations. Try Glenn Gould's 1981 recording.",w:"Goldberg Variations"},
+ {t:"Kind of Blue",by:"Miles Davis",y:"1959",n:"Modal jazz — improvisation over scales instead of chords.",w:"Kind of Blue"},
+ {t:"Symphony No. 9, 'From the New World'",by:"Antonín Dvořák",y:"1893",n:"Bohemia meets America; the Largo will follow you home.",w:"Symphony No. 9 (Dvořák)"},
+ {t:"Raga Bhairavi (morning raga)",by:"Ravi Shankar",y:"trad.",n:"Indian classical music assigns ragas to times of day.",w:"Bhairavi (Hindustani)"},
+ {t:"Mass in B minor — Et incarnatus est",by:"J.S. Bach",y:"1749",n:"Considered by many the summit of Western sacred music.",w:"Mass in B minor"},
+ {t:"Gymnopédie No. 1",by:"Erik Satie",y:"1888",n:"Music as furniture, as Satie said — yet unforgettable.",w:"Gymnopédies"},
+ {t:"A Love Supreme",by:"John Coltrane",y:"1965",n:"A four-part prayer in jazz form.",w:"A Love Supreme"},
+ {t:"The Four Seasons — Winter",by:"Antonio Vivaldi",y:"1725",n:"Program music three centuries early: listen for chattering teeth.",w:"The Four Seasons (Vivaldi)"},
+ {t:"Nocturne in E-flat major, Op. 9 No. 2",by:"Frédéric Chopin",y:"1832",n:"The piano taught to sing.",w:"Nocturnes, Op. 9 (Chopin)"},
+ {t:"Adagio for Strings",by:"Samuel Barber",y:"1936",n:"America's elegy; one long held breath.",w:"Adagio for Strings"},
+ {t:"Misa Criolla",by:"Ariel Ramírez",y:"1964",n:"The Mass set to Argentine folk rhythms.",w:"Misa Criolla"},
+ {t:"Cello Suite No. 1 in G major",by:"J.S. Bach",y:"c. 1720",n:"Lost for 150 years until a boy found it in a thrift shop — Pablo Casals.",w:"Cello Suites (Bach)"},
+ {t:"Rhapsody in Blue",by:"George Gershwin",y:"1924",n:"Jazz walks into the concert hall, clarinet first.",w:"Rhapsody in Blue"},
+ {t:"Pictures at an Exhibition",by:"Modest Mussorgsky",y:"1874",n:"A gallery walk in music — pairs perfectly with today's artwork.",w:"Pictures at an Exhibition"},
+ {t:"Both Directions at Once",by:"John Coltrane",y:"rec. 1963",n:"The 'lost album', found in 2018.",w:"Both Directions at Once: The Lost Album"},
+ {t:"Sakura Sakura (koto)",by:"Traditional, Japan",y:"trad.",n:"Cherry blossoms in pentatonic scale.",w:"Sakura Sakura"},
+ {t:"Symphony No. 7 — Allegretto",by:"Ludwig van Beethoven",y:"1812",n:"A funeral march that somehow dances.",w:"Symphony No. 7 (Beethoven)"},
+ {t:"Take Five",by:"The Dave Brubeck Quartet",y:"1959",n:"Proof that 5/4 time can swing.",w:"Take Five"},
+ {t:"Vespers (All-Night Vigil)",by:"Sergei Rachmaninoff",y:"1915",n:"Russian choral basses descending to a low B-flat.",w:"All-Night Vigil (Rachmaninoff)"},
+ {t:"El Cant dels Ocells",by:"Catalan trad. / Pau Casals",y:"trad.",n:"The Song of the Birds — Casals played it in exile for peace.",w:"El cant dels ocells"},
+ {t:"Concierto de Aranjuez — Adagio",by:"Joaquín Rodrigo",y:"1939",n:"Written by a blind composer about a garden he could only hear.",w:"Concierto de Aranjuez"},
+ {t:"Music for 18 Musicians",by:"Steve Reich",y:"1976",n:"Minimalism as a slowly turning kaleidoscope.",w:"Music for 18 Musicians"},
+ {t:"Dido's Lament",by:"Henry Purcell",y:"1689",n:"'Remember me' — five minutes of perfect grief.",w:"Dido and Aeneas"},
+ {t:"Mbube / The Lion Sleeps Tonight",by:"Solomon Linda",y:"1939",n:"A Zulu improvisation that conquered the world.",w:"Mbube (song)"},
+ {t:"Préludes, Book I — La cathédrale engloutie",by:"Claude Debussy",y:"1910",n:"A sunken cathedral rising from the sea in sound.",w:"Préludes (Debussy)"},
+ {t:"String Quartet No. 14, 'Death and the Maiden'",by:"Franz Schubert",y:"1824",n:"Written knowing he was dying; fierce, not resigned.",w:"Death and the Maiden Quartet"},
+ {t:"Buena Vista Social Club",by:"Various, Havana",y:"1997",n:"Cuban son revived by its original masters in their 80s.",w:"Buena Vista Social Club (album)"},
+ {t:"Fratres",by:"Arvo Pärt",y:"1977",n:"The same idea for a dozen instrumentations — hear two.",w:"Fratres"},
+ {t:"The Köln Concert",by:"Keith Jarrett",y:"1975",n:"Improvised on a broken piano he almost refused to play.",w:"The Köln Concert"},
+ {t:"Madama Butterfly — Un bel dì vedremo",by:"Giacomo Puccini",y:"1904",n:"Hope as an aria.",w:"Madama Butterfly"},
+ {t:"Appalachian Spring",by:"Aaron Copland",y:"1944",n:"'Simple Gifts' opened into wide American light.",w:"Appalachian Spring"},
+ {t:"Tabula Rasa",by:"Arvo Pärt",y:"1977",n:"Silence treated as an instrument.",w:"Tabula Rasa (Pärt)"},
+ {t:"Ave Maria (Caccini, attr. Vavilov)",by:"Vladimir Vavilov",y:"1970",n:"A modern forgery so beautiful nobody minded.",w:"Ave Maria (Vavilov)"}
+];
+
+const CRAFTS=[
+ {t:"Kintsugi",by:"Japan — golden repair of pottery",n:"Broken ceramics mended with gold lacquer: the break becomes the beauty.",w:"Kintsugi"},
+ {t:"Japanese wood joinery",by:"Japan — sashimono & miyadaiku carpentry",n:"Temples held together for 1,300 years without a single nail.",w:"Japanese carpentry"},
+ {t:"Damascus / pattern-welded steel",by:"Bladesmithing",n:"Layers of folded steel revealing waves like flowing water.",w:"Pattern welding"},
+ {t:"Murano glassblowing",by:"Venice, Italy — since 1291",n:"An island of furnaces guarding a thousand-year monopoly on light.",w:"Murano glass"},
+ {t:"Bookbinding by hand",by:"Europe & beyond",n:"Sewn signatures, leather, gold tooling — the codex as sculpture.",w:"Bookbinding"},
+ {t:"Ikat weaving",by:"Indonesia, Central Asia, India",n:"Threads dyed before weaving; the pattern exists only in the weaver's mind.",w:"Ikat"},
+ {t:"Stone dry-walling",by:"Britain, Ireland, worldwide",n:"Walls standing centuries with nothing but gravity and judgment.",w:"Dry stone"},
+ {t:"Urushi lacquerware",by:"Japan, China, Korea",n:"Thirty coats of tree sap, each polished, each a month of patience.",w:"Lacquerware"},
+ {t:"Stained glass",by:"Gothic Europe",n:"Chartres' blue has never been perfectly reproduced.",w:"Stained glass"},
+ {t:"Persian carpet weaving",by:"Iran",n:"A million knots tied by hand; deliberate flaws left in humility.",w:"Persian carpet"},
+ {t:"Shokunin knife-making",by:"Sakai & Seki, Japan",n:"Single-bevel blades sharpened on a progression of water stones.",w:"Japanese kitchen knife"},
+ {t:"Marquetry",by:"France & Italy",n:"Pictures painted in wood veneer, grain as brushstroke.",w:"Marquetry"},
+ {t:"Celadon ceramics",by:"Korea & China",n:"A glaze the color of 'the sky after rain, seen between clouds'.",w:"Celadon"},
+ {t:"Letterpress printing",by:"Gutenberg's lineage",n:"Type bites into paper; you can feel the words.",w:"Letterpress printing"},
+ {t:"Timber framing",by:"Medieval Europe & New England",n:"Mortise, tenon, and oak pegs — barns raised by whole villages.",w:"Timber framing"},
+ {t:"Calligraphy (Arabic)",by:"Islamic world",n:"Where images were discouraged, the word itself became art.",w:"Arabic calligraphy"},
+ {t:"Calligraphy (East Asian)",by:"China, Japan, Korea",n:"A lifetime of practice visible in one unhesitating stroke.",w:"East Asian calligraphy"},
+ {t:"Violin making (lutherie)",by:"Cremona, Italy",n:"Stradivari's varnish is still debated 300 years on.",w:"Luthier"},
+ {t:"Shou sugi ban",by:"Japan — charred cedar siding",n:"Wood preserved by fire, beautiful for eighty years.",w:"Yakisugi"},
+ {t:"Mosaic",by:"Byzantium & Rome",n:"Ravenna's ceilings: heaven assembled from glass squares.",w:"Mosaic"},
+ {t:"Falconry furniture & glove making",by:"Worldwide, 4,000 years",n:"An ancient partnership of leather, bells, and patience.",w:"Falconry"},
+ {t:"Watchmaking",by:"Swiss Jura & beyond",n:"A mechanical heart with 300 parts, assembled under a loupe.",w:"Watchmaker"},
+ {t:"Boatbuilding (clinker)",by:"Norse tradition",n:"Overlapping planks that flex with the sea — Viking ships' secret.",w:"Clinker (boat building)"},
+ {t:"Tapestry weaving",by:"Flanders & France",n:"The medieval internet: stories told wall-sized in wool.",w:"Tapestry"},
+ {t:"Netsuke carving",by:"Japan",n:"Entire worlds carved smaller than a walnut.",w:"Netsuke"},
+ {t:"Blacksmithing",by:"Everywhere fire met iron",n:"Drawing, upsetting, punching — a vocabulary of hammer blows.",w:"Blacksmith"},
+ {t:"Fresco painting",by:"Renaissance Italy",n:"Painting into wet plaster: no second chances, ever.",w:"Fresco"},
+ {t:"Origami (advanced)",by:"Japan & modern mathematics",n:"One uncut square; mathematicians now design folds by theorem.",w:"Origami"},
+ {t:"Cheesemaking (alpine)",by:"France & Switzerland",n:"Terroir, microbes, and caves — flavor as geography.",w:"Cheesemaking"},
+ {t:"Goldbeating & gilding",by:"Ancient craft, living few",n:"Gold hammered to 1/10,000 mm, laid on with a breath.",w:"Gold leaf"}
+];
+
+/* ---------- helpers ---------- */
+function el(id){return document.getElementById(id);}
+function skeleton(card,withImg){
+  card.innerHTML=(withImg?'<div class="card-img skeleton"></div>':'')+
+   '<div class="card-body skeleton"><div class="sk-line" style="width:30%"></div><div class="sk-line" style="width:80%;height:20px"></div><div class="sk-line" style="width:60%"></div><div class="sk-line"></div><div class="sk-line" style="width:90%"></div></div>';
+}
+function render(card,o){
+  const img=o.img?'<a href="'+(o.imgLink||o.links[0].u)+'" target="_blank"><img class="card-img" src="'+o.img+'" alt="" loading="lazy" onerror="this.style.display=\'none\'"></a>':'';
+  const links=o.links.map(l=>'<a href="'+l.u+'" target="_blank">'+l.n+'</a>').join('');
+  const body=o.poem?'<div class="poem-lines">'+o.poem+'</div>':'<div class="extract">'+(o.extract||'')+'</div>';
+  card.innerHTML=img+'<div class="card-body"><div class="cat"><span>'+o.cat+'</span><button class="star" title="Save to collection">★</button></div>'+
+   '<h2>'+o.title+'</h2><div class="byline">'+(o.byline||'')+'</div>'+body+'<div class="links">'+links+'</div></div>';
+  const star=card.querySelector('.star');
+  const key=o.cat+'|'+o.title;
+  if(getColl().some(x=>x.k===key))star.classList.add('saved');
+  star.onclick=()=>toggleSave({k:key,cat:o.cat,title:o.title,url:o.links[0].u,date:ymd},star);
+}
+function fail(card,cat,msg,links){
+  card.innerHTML='<div class="card-body"><div class="cat"><span>'+cat+'</span></div><h2 style="font-size:20px">Temporarily unreachable</h2><div class="err">'+msg+'</div>'+
+  (links?'<div class="links">'+links.map(l=>'<a href="'+l.u+'" target="_blank">'+l.n+'</a>').join('')+'</div>':'')+'</div>';
+}
+async function j(url){const r=await fetch(url);if(!r.ok)throw new Error(r.status);return r.json();}
+async function wikiSummary(title){
+  try{const d=await j('https://en.wikipedia.org/api/rest_v1/page/summary/'+encodeURIComponent(title.replace(/ /g,'_')));
+    /* upload.wikimedia.org only serves pre-rendered bucket widths (500/960/1280...) */
+    let img=null;
+    if(d.thumbnail){
+      const ow=d.originalimage?d.originalimage.width:0;
+      if(ow>=960)img=d.thumbnail.source.replace(/\/\d+px-/,'/960px-');
+      else if(ow>=500)img=d.thumbnail.source.replace(/\/\d+px-/,'/500px-');
+      else img=d.thumbnail.source;
+    }
+    return{extract:d.extract,img:img,url:d.content_urls?d.content_urls.desktop.page:wiki(title)};}
+  catch(e){return{extract:null,img:null,url:wiki(title)};}
+}
+
+/* ---------- collection (localStorage) ---------- */
+function getColl(){try{return JSON.parse(localStorage.getItem('beautyColl')||'[]');}catch(e){return[];}}
+function setColl(c){localStorage.setItem('beautyColl',JSON.stringify(c));renderColl();}
+function toggleSave(item,star){
+  let c=getColl();
+  if(c.some(x=>x.k===item.k)){c=c.filter(x=>x.k!==item.k);star.classList.remove('saved');}
+  else{c.unshift(item);star.classList.add('saved');}
+  setColl(c);
+}
+function renderColl(){
+  const c=getColl();
+  el('collList').innerHTML=c.length?c.map((x,i)=>
+   '<div class="coll-item"><button onclick="removeColl('+i+')">remove</button><div class="c">'+x.cat+'</div><a href="'+x.url+'" target="_blank">'+x.title+'</a><div class="d">saved '+x.date+'</div></div>'
+  ).join(''):'<div class="err">Nothing saved yet. Star anything that moves you.</div>';
+}
+function removeColl(i){const c=getColl();c.splice(i,1);setColl(c);}
+el('openColl').onclick=()=>{renderColl();el('collection').classList.add('open');};
+el('shareBtn').onclick=async()=>{
+  const url=location.href,btn=el('shareBtn');
+  const data={title:'Daily Beauty',text:'A daily gathering of beautiful things — art, music, nature, writing, and craft.',url:url};
+  if(navigator.share){try{await navigator.share(data);}catch(e){/* user cancelled */}}
+  else{
+    try{await navigator.clipboard.writeText(url);}catch(e){
+      const ta=document.createElement('textarea');ta.value=url;document.body.appendChild(ta);ta.select();document.execCommand('copy');ta.remove();
+    }
+    const old=btn.textContent;btn.textContent='Link copied ✓';setTimeout(()=>btn.textContent=old,2000);
+  }
+};
+el('closeColl').onclick=()=>el('collection').classList.remove('open');
+
+/* ---------- card loaders ---------- */
+async function loadArt(){
+  const card=el('card-art');skeleton(card,true);
+  try{
+    const page=1+Math.floor(rng()*900);
+    const d=await j('https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&fields=id,title,artist_display,artist_title,date_display,image_id,medium_display,short_description&limit=10&page='+page);
+    const a=(d.data||[]).find(x=>x.image_id)||d.data[0];
+    if(!a)throw new Error('none');
+    const img='https://www.artic.edu/iiif/2/'+a.image_id+'/full/843,/0/default.jpg';
+    const artist=(a.artist_title||a.artist_display||'Unknown artist').split('\n')[0];
+    render(card,{cat:'Artwork of the Day · Art Institute of Chicago',title:a.title,byline:artist+(a.date_display?' — '+a.date_display:''),
+      extract:(a.short_description||a.medium_display||'')+'',img:img,imgLink:'https://www.artic.edu/artworks/'+a.id,
+      links:[{n:'View at AIC',u:'https://www.artic.edu/artworks/'+a.id},
+             {n:'About the artist',u:'https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(artist)},
+             {n:'Lessons on this era',u:'https://smarthistory.org/?s='+encodeURIComponent(artist)},
+             {n:'See it bigger',u:img.replace('843,','1686,')}]});
+  }catch(e){
+    /* Met Museum fallback */
+    try{
+      const s=await j('https://collectionapi.metmuseum.org/public/collection/v1/search?isHighlight=true&hasImages=true&q=painting');
+      const id=s.objectIDs[Math.floor(rng()*s.objectIDs.length)];
+      const o=await j('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+id);
+      render(card,{cat:'Artwork of the Day · The Met',title:o.title,byline:(o.artistDisplayName||'Unknown')+' — '+o.objectDate,
+        extract:[o.medium,o.culture,o.department].filter(Boolean).join(' · '),img:o.primaryImageSmall,imgLink:o.objectURL,
+        links:[{n:'View at The Met',u:o.objectURL},{n:'About the artist',u:'https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(o.artistDisplayName||o.title)},{n:'Smarthistory',u:'https://smarthistory.org/?s='+encodeURIComponent(o.artistDisplayName||'')}]});
+    }catch(e2){fail(card,'Artwork of the Day','Museum APIs unreachable right now.',[{n:'Browse AIC highlights',u:'https://www.artic.edu/collection?is_public_domain=1'}]);}
+  }
+}
+
+async function loadMusic(){
+  const card=el('card-music');skeleton(card,true);
+  const m=pick(MUSIC);
+  const s=await wikiSummary(m.w);
+  render(card,{cat:'Music to Discover',title:m.t,byline:m.by+' · '+m.y,
+    extract:m.n+(s.extract?' — '+s.extract.slice(0,180)+'…':''),img:s.img,imgLink:s.url,
+    links:[{n:'Listen',u:yt(m.t+' '+m.by)},{n:'Read its story',u:s.url},{n:'How to listen deeply',u:'https://oyc.yale.edu/music/musi-112'}]});
+}
+
+async function loadNature(){
+  const card=el('card-nature');skeleton(card,true);
+  try{
+    const d=await j('https://api.nasa.gov/planetary/apod?api_key=DEMO_KEY&thumbs=true');
+    const img=d.media_type==='image'?d.url:(d.thumbnail_url||null);
+    render(card,{cat:'Nature & Cosmos · NASA',title:d.title,byline:d.copyright?('© '+d.copyright.trim()):'NASA Astronomy Picture of the Day',
+      extract:(d.explanation||'').slice(0,260)+'…',img:img,imgLink:d.hdurl||d.url,
+      links:[{n:'Full explanation',u:'https://apod.nasa.gov/apod/astropix.html'},{n:'High-res',u:d.hdurl||d.url},{n:'Learn astronomy free',u:'https://www.khanacademy.org/science/cosmology-and-astronomy'}]});
+  }catch(e){
+    /* APOD rate-limited: fall back to a curated natural wonder via Wikipedia */
+    const NATURE=[
+      {t:"Murmuration of starlings",w:"Flock (birds)"},{t:"Bioluminescent bays",w:"Bioluminescence"},
+      {t:"Aurora borealis",w:"Aurora"},{t:"Giant sequoias",w:"Sequoiadendron giganteum"},
+      {t:"The Great Barrier Reef",w:"Great Barrier Reef"},{t:"Monarch butterfly migration",w:"Monarch butterfly migration"},
+      {t:"Sailing stones of Death Valley",w:"Sailing stones"},{t:"Svalbard's midnight sun",w:"Midnight sun"},
+      {t:"The Wave, Arizona",w:"The Wave (Arizona)"},{t:"Snowflake symmetry",w:"Snowflake"},
+      {t:"Fjords of Norway",w:"Fjord"},{t:"Cherry blossom front",w:"Cherry blossom"},
+      {t:"Lenticular clouds",w:"Lenticular cloud"},{t:"Old-growth forests",w:"Old-growth forest"},
+      {t:"Tide pools",w:"Tide pool"},{t:"Glacial ice caves",w:"Ice cave"}
+    ];
+    const n=pick(NATURE);
+    const s=await wikiSummary(n.w);
+    render(card,{cat:'Nature & Cosmos',title:n.t,byline:'A natural wonder worth knowing',
+      extract:s.extract?s.extract.slice(0,260)+'…':'',img:s.img,imgLink:s.url,
+      links:[{n:'Read more',u:s.url},{n:'See it in motion',u:yt(n.t+' nature documentary 4k')},{n:"Today's APOD",u:'https://apod.nasa.gov/apod/astropix.html'}]});
+  }
+}
+
+async function loadFeed(){
+  const photoCard=el('card-photo'),writingCard=el('card-writing');
+  skeleton(photoCard,true);skeleton(writingCard,false);
+  try{
+    const [y,m,d]=ymd.split('-');
+    const f=await j('https://api.wikimedia.org/feed/v1/wikipedia/en/featured/'+y+'/'+m+'/'+d);
+    if(f.image){
+      const desc=f.image.description?f.image.description.text.replace(/<[^>]+>/g,''):'';
+      render(photoCard,{cat:'Photograph of the Day · Wikimedia',title:desc.slice(0,90)||f.image.title.replace('File:','').replace(/\.\w+$/,''),
+        byline:f.image.artist?f.image.artist.text:'',extract:desc.length>90?desc.slice(0,240)+'…':'',
+        img:f.image.thumbnail?f.image.thumbnail.source:f.image.image.source,imgLink:f.image.file_page,
+        links:[{n:'Full resolution & story',u:f.image.file_page},{n:'Learn photography',u:'https://www.youtube.com/results?search_query=composition+photography+masterclass'}]});
+    }else fail(photoCard,'Photograph of the Day','No featured image today.',[{n:'Commons POTD',u:'https://commons.wikimedia.org/wiki/Commons:Picture_of_the_day'}]);
+    if(f.tfa){
+      render(writingCard,{cat:'Featured Writing · Wikipedia',title:f.tfa.titles.normalized,byline:"Today's featured article — polished prose, vetted facts",
+        extract:(f.tfa.extract||'').slice(0,300)+'…',img:null,
+        links:[{n:'Read the article',u:f.tfa.content_urls.desktop.page},{n:'How featured articles are judged',u:'https://en.wikipedia.org/wiki/Wikipedia:Featured_article_criteria'}]});
+    }else fail(writingCard,'Featured Writing','No featured article returned.',[{n:'Wikipedia main page',u:'https://en.wikipedia.org/wiki/Main_Page'}]);
+  }catch(e){
+    fail(photoCard,'Photograph of the Day','Wikimedia feed unreachable.',[{n:'Commons POTD',u:'https://commons.wikimedia.org/wiki/Commons:Picture_of_the_day'}]);
+    fail(writingCard,'Featured Writing','Wikimedia feed unreachable.',[{n:'Wikipedia main page',u:'https://en.wikipedia.org/wiki/Main_Page'}]);
+  }
+}
+
+async function loadPoem(){
+  const card=el('card-poem');skeleton(card,false);
+  try{
+    const d=await j('https://poetrydb.org/random/1');
+    const p=d[0];
+    let lines=p.lines;let truncated=false;
+    if(lines.length>16){lines=lines.slice(0,16);truncated=true;}
+    render(card,{cat:'Poem of the Day',title:p.title,byline:p.author,
+      poem:lines.join('\n')+(truncated?'\n…':''),
+      links:[{n:'Full poem & poet',u:gsearch('"'+p.title+'" '+p.author+' poem')},
+             {n:'About '+p.author,u:'https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(p.author)},
+             {n:'How to read a poem',u:'https://www.poetryfoundation.org/learn/glossary-terms'}]});
+  }catch(e){fail(card,'Poem of the Day','PoetryDB unreachable.',[{n:'Poetry Foundation — Poem of the Day',u:'https://www.poetryfoundation.org/poems/poem-of-the-day'}]);}
+}
+
+async function loadCraft(){
+  const card=el('card-craft');skeleton(card,true);
+  const c=pick(CRAFTS);
+  const s=await wikiSummary(c.w);
+  render(card,{cat:'Skilled Craft of the Day',title:c.t,byline:c.by,
+    extract:c.n+(s.extract?' — '+s.extract.slice(0,220)+'…':''),img:s.img,imgLink:s.url,
+    links:[{n:'Watch it being made',u:yt(c.t+' process craftsmanship')},{n:'Read the history',u:s.url},{n:'Find a class near you',u:gsearch(c.t+' workshop class beginner')},{n:'Master at work',u:yt(c.t+' master documentary')}]});
+}
+
+/* ---------- run ---------- */
+function loadAll(){loadArt();loadMusic();loadNature();loadFeed();loadPoem();loadCraft();}
+el('surprise').onclick=()=>{ // reseed for a fresh set without waiting for tomorrow
+  seedStr=ymd+'-'+Math.random().toString(36).slice(2);
+  rng=mulberry32(xmur3(seedStr)());
+  document.getElementById('prompt').textContent='“'+pick(PROMPTS)+'”';
+  loadAll();
+};
+loadAll();
+</script>
+</body>
+</html>

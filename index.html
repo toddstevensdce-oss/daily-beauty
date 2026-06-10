@@ -249,7 +249,7 @@
     </div>
     <div class="learn-col"><h4>Music</h4>
       <a href="https://www.youtube.com/results?search_query=how+to+listen+to+classical+music+listening+guide" target="_blank">Listening guides on YouTube<span>How to hear what's happening</span></a>
-      <a href="https://oyc.yale.edu/music/musi-112" target="_blank">Open Yale: Listening to Music<span>Full free course</span></a>
+      <a href="https://www.coursera.org/learn/introclassicalmusic" target="_blank">Yale: Introduction to Classical Music<span>Craig Wright's course, free to audit</span></a>
       <a href="https://www.classicfm.com/discover-music/" target="_blank">Classic FM — Discover<span>Approachable deep dives</span></a>
       <a href="https://musictheory.net" target="_blank">musictheory.net<span>Learn the language itself</span></a>
     </div>
@@ -631,7 +631,7 @@ async function loadMusic(){
   const s=await wikiSummary(m.w);
   render(card,{cat:'Music to Discover',title:m.t,byline:m.by+' · '+m.y,
     extract:m.n+(s.extract?' — '+s.extract.slice(0,180)+'…':''),img:s.img,imgLink:s.url,
-    links:[{n:'Listen',u:yt(m.t+' '+m.by)},{n:'Read its story',u:s.url},{n:'How to listen deeply',u:'https://oyc.yale.edu/music/musi-112'}]});
+    links:[{n:'Listen',u:yt(m.t+' '+m.by)},{n:'Read its story',u:s.url},{n:'How to listen deeply',u:'https://www.coursera.org/learn/introclassicalmusic'}]});
 }
 
 async function loadNature(){

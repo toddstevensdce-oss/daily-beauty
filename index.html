@@ -234,6 +234,7 @@
   <article class="card" id="card-color"></article>
   <article class="card" id="card-idea"></article>
   <article class="card" id="card-bird"></article>
+  <article class="card wide" id="card-theo"></article>
 </main>
 
 <section class="learn">
@@ -269,6 +270,12 @@
       <a href="https://www.youtube.com/results?search_query=process+documentary+craft" target="_blank">Process documentaries<span>Watch hands at work</span></a>
       <a href="https://folklife.si.edu" target="_blank">Smithsonian Folklife<span>Living traditions</span></a>
       <a href="https://www.instructables.com" target="_blank">Instructables<span>Try a craft yourself</span></a>
+    </div>
+    <div class="learn-col"><h4>Theology</h4>
+      <a href="https://ccel.org" target="_blank">Christian Classics Ethereal Library<span>2,000 years of texts, free</span></a>
+      <a href="https://bookofconcord.org" target="_blank">The Book of Concord<span>The Lutheran Confessions online</span></a>
+      <a href="https://www.newadvent.org/summa/" target="_blank">Summa Theologiae<span>Aquinas, fully searchable</span></a>
+      <a href="https://issuesetc.org" target="_blank">Issues, Etc.<span>Confessional Lutheran radio</span></a>
     </div>
   </div>
 </section>
@@ -472,6 +479,31 @@ const BIRDS=[
  {t:"Australian Magpie",w:"Australian magpie",n:"Carols in complex ensemble pieces, sometimes for hours at dawn."}
 ];
 
+const THEO=[
+ {t:"Augustine of Hippo",by:"354–430 · Church Father",k:"Confessions",n:"'You have made us for Yourself, and our hearts are restless until they rest in You' — the first great spiritual autobiography.",w:"Augustine of Hippo",g:"Early Church"},
+ {t:"Athanasius of Alexandria",by:"c. 296–373 · Church Father",k:"On the Incarnation",n:"Stood contra mundum — against the world — for the full divinity of Christ, exiled five times and unbowed.",w:"Athanasius of Alexandria",g:"Early Church"},
+ {t:"Irenaeus of Lyons",by:"c. 130–202 · Church Father",k:"Against Heresies",n:"Learned the faith from Polycarp, who learned it from the Apostle John himself — two handshakes from the Gospel.",w:"Irenaeus",g:"Early Church"},
+ {t:"John Chrysostom",by:"c. 347–407 · Church Father",k:"Homilies",n:"'Golden-mouthed' — the greatest preacher of the early church, exiled for telling an empress the truth.",w:"John Chrysostom",g:"Early Church"},
+ {t:"Ignatius of Antioch",by:"d. c. 108 · Apostolic Father",k:"Letters",n:"Wrote seven letters to the churches while being marched to the lions in Rome.",w:"Ignatius of Antioch",g:"Early Church"},
+ {t:"Ambrose of Milan",by:"c. 339–397 · Church Father",k:"Hymns and treatises",n:"Taught the Western church to sing, faced down an emperor, and led Augustine to baptism.",w:"Ambrose",g:"Early Church"},
+ {t:"Anselm of Canterbury",by:"1033–1109 · Medieval",k:"Cur Deus Homo",n:"'Faith seeking understanding' — asked why God became man, and answered with unbroken logic.",w:"Anselm of Canterbury",g:"Medieval Masters"},
+ {t:"Bernard of Clairvaux",by:"1090–1153 · Medieval",k:"On Loving God",n:"The 'honey-tongued doctor' — Luther called him the greatest of the medieval teachers.",w:"Bernard of Clairvaux",g:"Medieval Masters"},
+ {t:"Thomas Aquinas",by:"1225–1274 · Medieval",k:"Summa Theologiae",n:"Wrote the most ambitious system of theology ever attempted — then saw a vision and called it all 'straw'.",w:"Thomas Aquinas",g:"Medieval Masters"},
+ {t:"John Wycliffe",by:"c. 1328–1384 · Medieval",k:"English Bible translation",n:"The 'Morning Star of the Reformation' — gave England the Scriptures in its own tongue.",w:"John Wycliffe",g:"Medieval Masters"},
+ {t:"Martin Luther",by:"1483–1546 · Reformation",k:"The Small Catechism",r:"https://bookofconcord.org/small-catechism/",n:"Nailed 95 theses to a church door and recovered the Gospel: justification by grace alone, through faith alone.",w:"Martin Luther",g:"Reformation"},
+ {t:"Philip Melanchthon",by:"1497–1560 · Reformation",k:"The Augsburg Confession",r:"https://bookofconcord.org/augsburg-confession/",n:"The quiet scholar who drafted the Augsburg Confession of 1530 — the Reformation's founding charter.",w:"Philip Melanchthon",g:"Reformation"},
+ {t:"Martin Chemnitz",by:"1522–1586 · Reformation",k:"Examination of the Council of Trent",n:"The 'Second Martin' — 'If Martin had not come, Martin would hardly have stood.' Architect of the Formula of Concord.",w:"Martin Chemnitz",g:"Reformation"},
+ {t:"John Calvin",by:"1509–1564 · Reformation",k:"Institutes of the Christian Religion",n:"Began the Institutes at 26 and spent a lifetime revising it — the most influential book of Protestant theology.",w:"John Calvin",g:"Reformation"},
+ {t:"Johann Gerhard",by:"1582–1637 · Lutheran Orthodoxy",k:"Sacred Meditations",n:"The greatest of the Lutheran scholastics, whose devotional writing is as warm as his dogmatics are precise.",w:"Johann Gerhard",g:"Reformation"},
+ {t:"Thomas Cranmer",by:"1489–1556 · Reformation",k:"The Book of Common Prayer",n:"Shaped the English language itself through his collects — and died holding his writing hand first into the flames.",w:"Thomas Cranmer",g:"Reformation"},
+ {t:"C. F. W. Walther",by:"1811–1887 · Confessional Lutheran",k:"The Proper Distinction Between Law and Gospel",n:"His evening lectures to seminarians on Law and Gospel remain the classic on rightly dividing the Word.",w:"C. F. W. Walther",g:"Modern Confessors"},
+ {t:"Francis Pieper",by:"1852–1931 · Confessional Lutheran",k:"Christian Dogmatics",n:"Three volumes of carefully ordered doctrine that still anchor confessional Lutheran seminaries today.",w:"Franz Pieper",g:"Modern Confessors"},
+ {t:"Hermann Sasse",by:"1895–1976 · Confessional Lutheran",k:"Letters to Lutheran Pastors",n:"Resisted both the Nazis and easy compromise — a confessor who wrote 'Here We Stand' and meant it.",w:"Hermann Sasse",g:"Modern Confessors"},
+ {t:"Dietrich Bonhoeffer",by:"1906–1945 · Modern Martyr",k:"The Cost of Discipleship",n:"'When Christ calls a man, he bids him come and die.' Hanged at Flossenbürg three weeks before liberation.",w:"Dietrich Bonhoeffer",g:"Modern Confessors"},
+ {t:"C. S. Lewis",by:"1898–1963 · Lay Theologian",k:"Mere Christianity",n:"Wartime radio talks that became the 20th century's most-read case for the faith.",w:"C. S. Lewis",g:"Modern Confessors"},
+ {t:"Bo Giertz",by:"1905–1998 · Confessional Lutheran",k:"The Hammer of God",n:"A Swedish bishop who taught doctrine through a novel — three generations of pastors learning grace the hard way.",w:"Bo Giertz",g:"Modern Confessors"}
+];
+
 /* group tags for weekly threads, derived from existing fields */
 const MGROUP={"J.S. Bach":"Baroque & Early","Antonio Vivaldi":"Baroque & Early","Henry Purcell":"Baroque & Early",
  "Antonín Dvořák":"The Romantics","Frédéric Chopin":"The Romantics","Ludwig van Beethoven":"The Romantics","Franz Schubert":"The Romantics","Modest Mussorgsky":"The Romantics","Giacomo Puccini":"The Romantics","Sergei Rachmaninoff":"The Romantics",
@@ -493,7 +525,7 @@ function updateThreadline(){
   btn.textContent='Weekly Threads: '+(threadsOn?'On':'Off');
   if(!threadsOn){tl.style.display='none';return;}
   tl.style.display='';
-  tl.textContent="This week's threads — Music: "+weekTheme(MUSIC,'music')+' · Craft: '+weekTheme(CRAFTS,'craft')+' · Architecture: '+weekTheme(ARCH,'arch');
+  tl.textContent="This week's threads — Music: "+weekTheme(MUSIC,'music')+' · Craft: '+weekTheme(CRAFTS,'craft')+' · Architecture: '+weekTheme(ARCH,'arch')+' · Theology: '+weekTheme(THEO,'theo');
 }
 
 /* ---------- helpers ---------- */
@@ -714,8 +746,17 @@ async function loadBird(){
     links:[{n:'Hear its song',u:'https://xeno-canto.org/explore?query='+encodeURIComponent('"'+b.t+'"')},{n:'About this bird',u:s.url},{n:'Learn birdsong',u:'https://www.allaboutbirds.org/news/how-to-learn-bird-songs-and-calls/'}]});
 }
 
+async function loadTheo(){
+  const card=el('card-theo');skeleton(card,true);
+  const t=themedPick(THEO,'theo');
+  const s=await wikiSummary(t.w);
+  render(card,{cat:'Theologian of the Day',title:t.t,byline:t.by,
+    extract:t.n+(s.extract?' — '+s.extract.slice(0,200)+'…':''),img:s.img,imgLink:s.url,
+    links:[{n:'Their life',u:s.url},{n:'Read: '+t.k,u:t.r||gsearch(t.k+' '+t.t+' read online free')},{n:'Lectures',u:yt(t.t+' theology lecture')},{n:'Classic texts library',u:'https://ccel.org'}]});
+}
+
 /* ---------- run ---------- */
-function loadAll(){loadArt();loadMusic();loadNature();loadFeed();loadPoem();loadCraft();loadArch();loadColor();loadIdea();loadBird();}
+function loadAll(){loadArt();loadMusic();loadNature();loadFeed();loadPoem();loadCraft();loadArch();loadColor();loadIdea();loadBird();loadTheo();}
 el('threadsBtn').onclick=()=>{
   threadsOn=!threadsOn;
   localStorage.setItem('beautyThreads',threadsOn?'1':'0');

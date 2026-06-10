@@ -234,7 +234,6 @@
   <article class="card" id="card-color"></article>
   <article class="card" id="card-idea"></article>
   <article class="card" id="card-bird"></article>
-  <article class="card" id="card-births"></article>
 </main>
 
 <section class="learn">
@@ -715,26 +714,8 @@ async function loadBird(){
     links:[{n:'Hear its song',u:'https://xeno-canto.org/explore?query='+encodeURIComponent('"'+b.t+'"')},{n:'About this bird',u:s.url},{n:'Learn birdsong',u:'https://www.allaboutbirds.org/news/how-to-learn-bird-songs-and-calls/'}]});
 }
 
-async function loadBirths(){
-  const card=el('card-births');skeleton(card,false);
-  try{
-    const [y,m,d]=ymd.split('-');
-    const f=await j('https://api.wikimedia.org/feed/v1/wikipedia/en/onthisday/births/'+m+'/'+d);
-    const re=/(paint|compos|poet|writ|novel|sculpt|architect|music|sing|danc|photograph|film|artist|cellist|violin|pian|design|craft)/i;
-    const cands=(f.births||[]).filter(b=>re.test(b.text)||(b.pages&&b.pages[0]&&re.test(b.pages[0].description||'')));
-    if(!cands.length)throw new Error('none');
-    const b=cands[Math.floor(rng()*cands.length)];
-    const p=(b.pages||[]).find(pg=>re.test(pg.description||''))||b.pages[0];
-    render(card,{cat:'Born on This Day',title:p?p.titles.normalized:b.text.split(',')[0],
-      byline:b.year+(p&&p.description?' — '+p.description:''),
-      extract:(p&&p.extract?p.extract.slice(0,260)+'…':b.text),
-      img:p&&p.thumbnail?p.thumbnail.source:null,imgLink:p?p.content_urls.desktop.page:null,
-      links:[{n:'Their life',u:p?p.content_urls.desktop.page:gsearch(b.text)},{n:'Their work',u:yt((p?p.titles.normalized:b.text)+' greatest works')}]});
-  }catch(e){fail(card,'Born on This Day','No artistic births found for today.',[{n:'On this day',u:'https://en.wikipedia.org/wiki/Wikipedia:On_this_day/Today'}]);}
-}
-
 /* ---------- run ---------- */
-function loadAll(){loadArt();loadMusic();loadNature();loadFeed();loadPoem();loadCraft();loadArch();loadColor();loadIdea();loadBird();loadBirths();}
+function loadAll(){loadArt();loadMusic();loadNature();loadFeed();loadPoem();loadCraft();loadArch();loadColor();loadIdea();loadBird();}
 el('threadsBtn').onclick=()=>{
   threadsOn=!threadsOn;
   localStorage.setItem('beautyThreads',threadsOn?'1':'0');

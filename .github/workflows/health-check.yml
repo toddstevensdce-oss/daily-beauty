@@ -1,0 +1,63 @@
+name: Weekly health check
+
+on:
+  schedule:
+    - cron: '0 13 * * 1'   # Mondays 13:00 UTC (7 am US Central in winter, 8 am in summer)
+  workflow_dispatch:        # "Run workflow" button for an on-demand check
+
+permissions:
+  contents: write   # commit the weekly report (also keeps the schedule from going dormant)
+  issues: write     # open or close the "health-check" issue
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check data sources, Wikipedia entries, and links
+        id: check
+        continue-on-error: true
+        run: node scripts/health-check.mjs
+
+      # GitHub pauses scheduled workflows in public repos after 60 days without commits,
+      # so saving the report each week keeps the check running indefinitely.
+      - name: Save this week's report
+        run: |
+          cp report.md health-report.md
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add health-report.md
+          git commit -m "Weekly health check report" || echo "No change to commit"
+          git push
+
+      - name: Open or update an issue when something is broken
+        if: steps.check.outcome == 'failure'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create health-check --color B60205 --description "Found by the weekly health check" --force
+          num=$(gh issue list --label health-check --state open --json number --jq '.[0].number // empty')
+          if [ -n "$num" ]; then
+            gh issue comment "$num" --body-file report.md
+          else
+            gh issue create --title "Daily Beauty: health check found broken sources or links" --label health-check --body-file report.md
+          fi
+
+      - name: Close the issue once everything works again
+        if: steps.check.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for n in $(gh issue list --label health-check --state open --json number --jq '.[].number'); do
+            gh issue close "$n" --comment "This week's check passed. Everything is working again."
+          done
+
+      - name: Mark the run as failed so GitHub also emails about it
+        if: steps.check.outcome == 'failure'
+        run: exit 1

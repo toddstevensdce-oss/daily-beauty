@@ -599,11 +599,15 @@ el('closeColl').onclick=()=>el('collection').classList.remove('open');
 /* ---------- card loaders ---------- */
 async function loadArt(){
   const card=el('card-art');skeleton(card,true);
+  /* draw today's random numbers up front so network timing can't shift other cards' picks */
+  const rPage=rng(),rItem=rng(),rMet=rng();
   try{
-    const page=1+Math.floor(rng()*900);
+    /* AIC search only serves the first 1,000 results: page x limit must stay <= 1000 */
+    const page=1+Math.floor(rPage*100);
     const d=await j('https://api.artic.edu/api/v1/artworks/search?query[term][is_public_domain]=true&fields=id,title,artist_display,artist_title,date_display,image_id,medium_display,short_description&limit=10&page='+page);
-    const a=(d.data||[]).find(x=>x.image_id)||d.data[0];
-    if(!a)throw new Error('none');
+    const withImg=(d.data||[]).filter(x=>x.image_id);
+    if(!withImg.length)throw new Error('none');
+    const a=withImg[Math.floor(rItem*withImg.length)];
     const img='https://www.artic.edu/iiif/2/'+a.image_id+'/full/843,/0/default.jpg';
     const artist=(a.artist_title||a.artist_display||'Unknown artist').split('\n')[0];
     render(card,{cat:'Artwork of the Day · Art Institute of Chicago',title:a.title,byline:artist+(a.date_display?' — '+a.date_display:''),
@@ -613,15 +617,22 @@ async function loadArt(){
              {n:'Lessons on this era',u:'https://smarthistory.org/?s='+encodeURIComponent(artist)},
              {n:'See it bigger',u:img.replace('843,','1686,')}]});
   }catch(e){
-    /* Met Museum fallback */
+    /* Met Museum fallback (v1 search retired 2026-10-01; v1.1 is paginated by offset/limit) */
     try{
-      const s=await j('https://collectionapi.metmuseum.org/public/collection/v1/search?isHighlight=true&hasImages=true&q=painting');
-      const id=s.objectIDs[Math.floor(rng()*s.objectIDs.length)];
-      const o=await j('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+id);
+      const base='https://collectionapi.metmuseum.org/public/collection/v1.1/search?isHighlight=true&hasImages=true&q=painting';
+      const head=await j(base+'&offset=0&limit=1');
+      const off=Math.floor(rMet*Math.max(1,(head.total||1)-10));
+      const s=await j(base+'&offset='+off+'&limit=10');
+      let o=null;
+      for(const id of (s.objectIDs||[])){
+        const x=await j('https://collectionapi.metmuseum.org/public/collection/v1/objects/'+id);
+        if(x.primaryImageSmall){o=x;break;}
+      }
+      if(!o)throw new Error('no Met image');
       render(card,{cat:'Artwork of the Day · The Met',title:o.title,byline:(o.artistDisplayName||'Unknown')+' — '+o.objectDate,
         extract:[o.medium,o.culture,o.department].filter(Boolean).join(' · '),img:o.primaryImageSmall,imgLink:o.objectURL,
         links:[{n:'View at The Met',u:o.objectURL},{n:'About the artist',u:'https://en.wikipedia.org/wiki/Special:Search?search='+encodeURIComponent(o.artistDisplayName||o.title)},{n:'Smarthistory',u:'https://smarthistory.org/?s='+encodeURIComponent(o.artistDisplayName||'')}]});
-    }catch(e2){fail(card,'Artwork of the Day','Museum APIs unreachable right now.',[{n:'Browse AIC highlights',u:'https://www.artic.edu/collection?is_public_domain=1'}]);}
+    }catch(e2){fail(card,'Artwork of the Day','Museum APIs unreachable right now.',[{n:'Browse AIC collection',u:'https://www.artic.edu/collection'},{n:'Browse The Met',u:'https://www.metmuseum.org/art/collection/search'}]);}
   }
 }
 
